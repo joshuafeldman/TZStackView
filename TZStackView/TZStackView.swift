@@ -297,8 +297,13 @@ public class TZStackView: UIView {
                         
                         switch axis {
                         case .Horizontal:
-                            stackViewConstraints.append(constraint(item: previousArrangedSubview, attribute: .CenterX, toItem: spacerView, attribute: .Leading))
-                            stackViewConstraints.append(constraint(item: arrangedSubview, attribute: .CenterX, toItem: spacerView, attribute: .Trailing))
+                            if #available(iOS 9.0, *) {
+                                stackViewConstraints.append(constraint(item: previousArrangedSubview, attribute: .CenterX, toItem: spacerView, attribute: .Leading))
+                                stackViewConstraints.append(constraint(item: arrangedSubview, attribute: .CenterX, toItem: spacerView, attribute: .Trailing))
+                            } else {
+                                stackViewConstraints.append(constraint(item: previousArrangedSubview, attribute: .CenterX, toItem: spacerView, attribute: .Right))
+                                stackViewConstraints.append(constraint(item: arrangedSubview, attribute: .CenterX, toItem: spacerView, attribute: .Left))
+                            }
                         case .Vertical:
                             stackViewConstraints.append(constraint(item: previousArrangedSubview, attribute: .CenterY, toItem: spacerView, attribute: .Top))
                             stackViewConstraints.append(constraint(item: arrangedSubview, attribute: .CenterY, toItem: spacerView, attribute: .Bottom))
@@ -370,8 +375,13 @@ public class TZStackView: UIView {
                 constraints.append(constraint(item: spacerView, attribute: .Top, relatedBy: topRelation, toItem: view, priority: topPriority))
                 constraints.append(constraint(item: spacerView, attribute: .Bottom, relatedBy: bottomRelation, toItem: view, priority: bottomPriority))
             case .Vertical:
-                constraints.append(constraint(item: spacerView, attribute: .Leading, relatedBy: topRelation, toItem: view, priority: topPriority))
-                constraints.append(constraint(item: spacerView, attribute: .Trailing, relatedBy: bottomRelation, toItem: view, priority: bottomPriority))
+                if #available(iOS 9.0, *) {
+                    constraints.append(constraint(item: spacerView, attribute: .Leading, relatedBy: topRelation, toItem: view, priority: topPriority))
+                    constraints.append(constraint(item: spacerView, attribute: .Trailing, relatedBy: bottomRelation, toItem: view, priority: bottomPriority))
+                } else {
+                    constraints.append(constraint(item: spacerView, attribute: .Left, relatedBy: topRelation, toItem: view, priority: topPriority))
+                    constraints.append(constraint(item: spacerView, attribute: .Right, relatedBy: bottomRelation, toItem: view, priority: bottomPriority))
+                }
             }
         }
         switch axis {
@@ -453,8 +463,11 @@ public class TZStackView: UIView {
                 }
                 switch axis {
                 case .Horizontal:
-                    constraints.append(constraint(item: view, attribute: .Leading, relatedBy: relation, toItem: previousView, attribute: .Trailing, constant: c, priority: priority))
-                    
+                    if #available(iOS 9.0, *) {
+                        constraints.append(constraint(item: view, attribute: .Leading, relatedBy: relation, toItem: previousView, attribute: .Trailing, constant: c, priority: priority))
+                    } else {
+                        constraints.append(constraint(item: view, attribute: .Left, relatedBy: relation, toItem: previousView, attribute: .Right, constant: c, priority: priority))
+                    }
                 case .Vertical:
                     constraints.append(constraint(item: view, attribute: .Top, relatedBy: relation, toItem: previousView, attribute: .Bottom, constant: c, priority: priority))
                 }
@@ -487,14 +500,27 @@ public class TZStackView: UIView {
         case .Vertical:
             switch alignment {
             case .Fill:
-                constraints += equalAttributes(views: views, attribute: .Leading)
-                constraints += equalAttributes(views: views, attribute: .Trailing)
+                if #available(iOS 9.0, *) {
+                    constraints += equalAttributes(views: views, attribute: .Leading)
+                    constraints += equalAttributes(views: views, attribute: .Trailing)
+                } else {
+                    constraints += equalAttributes(views: views, attribute: .Left)
+                    constraints += equalAttributes(views: views, attribute: .Right)
+                }
             case .Center:
                 constraints += equalAttributes(views: views, attribute: .CenterX)
             case .Leading, .Top:
-                constraints += equalAttributes(views: views, attribute: .Leading)
+                if #available(iOS 9.0, *) {
+                    constraints += equalAttributes(views: views, attribute: .Leading)
+                } else {
+                    constraints += equalAttributes(views: views, attribute: .Left)
+                }
             case .Trailing, .Bottom:
-                constraints += equalAttributes(views: views, attribute: .Trailing)
+                if #available(iOS 9.0, *) {
+                    constraints += equalAttributes(views: views, attribute: .Trailing)
+                } else {
+                    constraints += equalAttributes(views: views, attribute: .Right)
+                }
             case .FirstBaseline:
                 constraints += []
             }
@@ -536,10 +562,18 @@ public class TZStackView: UIView {
         switch axis {
         case .Horizontal:
             if let firstView = firstView {
-                constraints.append(constraint(item: firstItem, attribute: .Leading, toItem: firstView))
+                if #available(iOS 9.0, *) {
+                    constraints.append(constraint(item: firstItem, attribute: .Leading, toItem: firstView))
+                } else {
+                    constraints.append(constraint(item: firstItem, attribute: .Left, toItem: firstView))
+                }
             }
             if let lastView = lastView {
-                constraints.append(constraint(item: firstItem, attribute: .Trailing, toItem: lastView))
+                if #available(iOS 9.0, *) {
+                    constraints.append(constraint(item: firstItem, attribute: .Trailing, toItem: lastView))
+                } else {
+                    constraints.append(constraint(item: firstItem, attribute: .Right, toItem: lastView))
+                }
             }
             
             constraints.append(constraint(item: firstItem, attribute: .Top, toItem: topView))
@@ -555,9 +589,14 @@ public class TZStackView: UIView {
             if let lastView = lastView {
                 constraints.append(constraint(item: firstItem, attribute: .Bottom, toItem: lastView))
             }
-
-            constraints.append(constraint(item: firstItem, attribute: .Leading, toItem: topView))
-            constraints.append(constraint(item: firstItem, attribute: .Trailing, toItem: bottomView))
+            
+            if #available(iOS 9.0, *) {
+                constraints.append(constraint(item: firstItem, attribute: .Leading, toItem: topView))
+                constraints.append(constraint(item: firstItem, attribute: .Trailing, toItem: bottomView))
+            } else {
+                constraints.append(constraint(item: firstItem, attribute: .Left, toItem: topView))
+                constraints.append(constraint(item: firstItem, attribute: .Right, toItem: bottomView))
+            }
 
             if alignment == .Center {
                 constraints.append(constraint(item: firstItem, attribute: .CenterX, toItem: arrangedSubviews.first!))
