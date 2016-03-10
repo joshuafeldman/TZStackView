@@ -322,10 +322,17 @@ public class TZStackView: UIView {
 
             if layoutMarginsRelativeArrangement {
                 if spacerViews.count > 0 {
-                    stackViewConstraints.append(constraint(item: self, attribute: .BottomMargin, toItem: spacerViews[0]))
-                    stackViewConstraints.append(constraint(item: self, attribute: .LeftMargin, toItem: spacerViews[0]))
-                    stackViewConstraints.append(constraint(item: self, attribute: .RightMargin, toItem: spacerViews[0]))
-                    stackViewConstraints.append(constraint(item: self, attribute: .TopMargin, toItem: spacerViews[0]))
+                    if #available(iOS 8.0, *) {
+                        stackViewConstraints.append(constraint(item: self, attribute: .BottomMargin, toItem: spacerViews[0]))
+                        stackViewConstraints.append(constraint(item: self, attribute: .LeftMargin, toItem: spacerViews[0]))
+                        stackViewConstraints.append(constraint(item: self, attribute: .RightMargin, toItem: spacerViews[0]))
+                        stackViewConstraints.append(constraint(item: self, attribute: .TopMargin, toItem: spacerViews[0]))
+                    } else {
+                        stackViewConstraints.append(constraint(item: self, attribute: .Bottom, toItem: spacerViews[0]))
+                        stackViewConstraints.append(constraint(item: self, attribute: .Left, toItem: spacerViews[0]))
+                        stackViewConstraints.append(constraint(item: self, attribute: .Right, toItem: spacerViews[0]))
+                        stackViewConstraints.append(constraint(item: self, attribute: .Top, toItem: spacerViews[0]))
+                    }
                 }
             }
             addConstraints(stackViewConstraints)
@@ -494,7 +501,11 @@ public class TZStackView: UIView {
             case .Trailing, .Bottom:
                 constraints += equalAttributes(views: views, attribute: .Bottom)
             case .FirstBaseline:
-                constraints += equalAttributes(views: views, attribute: .FirstBaseline)
+                if #available(iOS 8.0, *) {
+                    constraints += equalAttributes(views: views, attribute: .FirstBaseline)
+                } else {
+                    constraints += equalAttributes(views: views, attribute: .Baseline)
+                }
             }
             
         case .Vertical:
